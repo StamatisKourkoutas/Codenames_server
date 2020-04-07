@@ -13,5 +13,8 @@
     "express": "^4.17.1",
     "shuffle-seed": "^1.1.6",
     "socket.io": "^2.3.0"
+  },
+  "engines": {
+    "node": "12.x"
   }
 }
