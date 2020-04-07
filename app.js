@@ -1,3 +1,5 @@
+var Room = require('./Room.js')
+
 const express = require("express");
 const app = express();
 
@@ -12,20 +14,30 @@ const io = socketIo(server);
 
 const port = process.env.PORT || 4001;
 
+var myRooms = {}
+var users = {}
 
 io.on("connection", (clientSocket) => {
-  // Log connection to server
   console.log("Client:", clientSocket.id, "connected to server");
   
   clientSocket.on("disconnecting", () => {
+    console.log("Client:", clientSocket.id, "disconnecting from server")
+
     Object.keys(clientSocket.rooms).forEach(roomName => {
       if(clientSocket.id!=roomName){
-        //console.log("Notify room", roomName, "for imminent disconect");
-        clients = Object.keys(io.sockets.adapter.rooms[roomName].sockets);
-        clients2 = clients.filter(client => client!==clientSocket.id);
-
+        // Delete from room
+        myRooms[roomName].removeClient(clientSocket.id);
+        
         // Notify everyone in the room about all others
-        io.sockets.in(roomName).emit("ClientUpdate", clients2);
+        console.log(myRooms[roomName].clients)
+        if(Object.keys(myRooms[roomName].clients).length>0){
+          io.sockets.in(roomName).emit("ClientsUpdate", myRooms[roomName].clients);
+        }else{
+          delete myRooms[roomName]
+        }
+
+        //clients = Object.keys(io.sockets.adapter.rooms[roomName].sockets);
+        //clients2 = clients.filter(client => client!==clientSocket.id);     
       };
     });
   });
@@ -35,26 +47,66 @@ io.on("connection", (clientSocket) => {
   });
 
   clientSocket.on("JoinRoom", (roomName) => {
-    // Log join to a room
     console.log("Client:", clientSocket.id, "joined room:", roomName);
+
+    // Create room for first client
+    if (!(roomName in myRooms)){
+      myRooms[roomName] = new Room(roomName);
+    }
+
     // Join room
     clientSocket.join(roomName);
-    // Notify everyone in the room about all others
-    clients = Object.keys(io.sockets.adapter.rooms[roomName].sockets)
-    io.sockets.in(roomName).emit("ClientUpdate", clients);
+    var usr = "";
+    if(clientSocket.id in users){
+      usr=users[clientSocket.id]
+    }
+    myRooms[roomName].addClient(clientSocket.id, usr);
 
-    //console.log(io.sockets.adapter.rooms[roomName]); // for debug
+    // Notify everyone in the room about all others
+    console.log(myRooms[roomName].clients)
+    io.sockets.in(roomName).emit("ClientsUpdate", myRooms[roomName].clients);
+    io.sockets.in(roomName).emit("BoardUpdate", myRooms[roomName].wordList);//
   });
 
   clientSocket.on("LeaveRoom", (roomName) => {
-    // Log leave from a room
     console.log("Client:", clientSocket.id, "left room:", roomName);
-    // Leave room
+
+    // Leave room and delete from room
     clientSocket.leave(roomName);
+    myRooms[roomName].removeClient(clientSocket.id);
+
     // Notify everyone in the room about all others
-    clients = Object.keys(io.sockets.adapter.rooms[roomName].sockets)
-    io.sockets.in(roomName).emit("ClientUpdate", clients);
+    console.log(myRooms[roomName].clients)
+    if(Object.keys(myRooms[roomName].clients).length>0){
+      io.sockets.in(roomName).emit("ClientsUpdate", myRooms[roomName].clients);
+    }else{
+      delete myRooms[roomName]
+    }
   });
+
+  clientSocket.on("SpymasterChange", (clients,roomName) => {
+    console.log("Client:", clientSocket.id, "changed spymaster in:", roomName);
+
+    myRooms[roomName].clients = clients;
+
+    // Notify everyone in the room about all others
+    console.log(myRooms[roomName].clients)
+    io.sockets.in(roomName).emit("ClientsUpdate", myRooms[roomName].clients);
+  });
+
+  clientSocket.on("WordListChange", (id,roomName) => {
+    console.log("Client:", clientSocket.id, "oppened word", id, "in:", roomName);
+
+    myRooms[roomName].openCard(id);
+
+    // Notify everyone in the room about change
+    io.sockets.in(roomName).emit("BoardUpdate", myRooms[roomName].wordList);
+  });
+
+  clientSocket.on("ChangeUsername", (usr) => {
+    console.log("Client:", clientSocket.id, "set username:", usr);
+    users[clientSocket.id]=usr;
+  })
 });
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
