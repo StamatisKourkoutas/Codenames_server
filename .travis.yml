@@ -1,12 +1,14 @@
 language: node_js
 node_js:
-  - "stable"
+- stable
 cache:
   directories:
-    - "node_modules"
-script: mvn clean verify
+  - node_modules
+before_install:
+  - openssl aes-256-cbc -k "$secret_password" -in deploypsw.txt.enc -out deploypsw.txt -d
 deploy:
   provider: heroku
-  api_key:
-    secure:
   app: codenames_server
+env:
+  global:
+  - secure: kjq+/1cfZFBxgsqIMZDGNTIJA/266gRnSfFRsbNENeP37VMxzTwDjmIYUP3Sghk5GskYaDm9R9Z1MGoP3t/qaLoLZpvhgAFBx4oBEff/oj2iXckUTwh8lPS6jk9A+JJaDkANmcoOmOdu8cp2BRMruwZLZzNq2dcou2C85W8bstT6AMkzjfiHXx9eC7ZES5PScUM456JNn9UVqZRg0V5uDiTaPr3qSvr0Gl37pLuRaHjIQDeSxzya15/giEXMY65nrYEokHomSdGhf9SfFfmWr++xhFKOaPw6GWvKcR7sL50eGlMDEr9i6dsiLGI9kvqAx7jsUPANKwlccPW8v//2fNn9w0Kosa4vLUSLtI7rKaWX1NWyD/p2NNjhcCxTHvM5nmY95cpg/ezMF/J1gfX5iuCiMZh7MeA4pHEsnYiRhg2IwzHvFj3auuqg5v8+12gxnjgrQdBz3/YdBnL5iRx3MpSyoKcA5E2IkAcZcgIV5q+vi7b9MKBPnKbvSdg6neCayJXq3yoYvlywh/WLqPEiMmyfBGGKe3HF+/HhRmWh1D8+bMAyX3q/neHDZj/9SMbrIQCbiYJIdpotx41pfF1+z7ptkjgnBH/cFthyFpFAXwFLMgnibis1WLJeJrnYbZzQpUwjVi4fTGRB2SyxAkzLf/2YVqcyzzq9digyXFy/gqU=
