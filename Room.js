@@ -33,10 +33,6 @@ class Room{
     return shuffleSeed.shuffle(temp, seed);
   }
 
-  initialiseRoom(){
-    return wordListGenerator(words)
-  };
-
   nextTurn(){
     if(turn==="red"){
       turn = "blue";
@@ -55,6 +51,10 @@ class Room{
 
   changeSpymasterStatus(id){
     this.clients[id] = !this.clients[id];
+  }
+
+  newGame(language){
+    this.wordList = this.wordListGenerator(language);
   }
 
   openCard(id){

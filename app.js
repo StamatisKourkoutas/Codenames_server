@@ -94,6 +94,15 @@ io.on("connection", (clientSocket) => {
     io.sockets.in(roomName).emit("ClientsUpdate", myRooms[roomName].clients);
   });
 
+  clientSocket.on("NewGame", (roomName, language) => {
+    console.log("Client:", clientSocket.id, "started new game in:", roomName);
+
+    myRooms[roomName].newGame(language);
+
+    // Notify everyone in the room about change
+    io.sockets.in(roomName).emit("BoardUpdate", myRooms[roomName].wordList);
+  });
+
   clientSocket.on("WordListChange", (id,roomName) => {
     console.log("Client:", clientSocket.id, "oppened word", id, "in:", roomName);
 
