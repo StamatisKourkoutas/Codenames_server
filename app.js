@@ -46,12 +46,12 @@ io.on("connection", (clientSocket) => {
     console.log("Client:", clientSocket.id, "disconnected from server")
   });
 
-  clientSocket.on("JoinRoom", (roomName) => {
+  clientSocket.on("JoinRoom", (roomName, language) => {
     console.log("Client:", clientSocket.id, "joined room:", roomName);
 
     // Create room for first client
     if (!(roomName in myRooms)){
-      myRooms[roomName] = new Room(roomName);
+      myRooms[roomName] = new Room(roomName, language);
     }
 
     // Join room

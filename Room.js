@@ -1,17 +1,24 @@
 const shuffleSeed = require('shuffle-seed')
 const words = require('./words.js')
+const wordsGreek = require('./wordsGreek.js')
 
 class Room{
-  constructor (roomName){
-    this.wordList = this.wordListGenerator();
+  constructor (roomName, language){
+    this.wordList = this.wordListGenerator(language);
     this.roomName = roomName;
     this.turn = "red";
     this.clients = {};
   }
 
-  wordListGenerator(){
+  wordListGenerator(language){
+    var wordList = [];
+    if(language==="greek"){
+      wordList = wordsGreek;
+    }else{
+      wordList = words;
+    }
     var seed = Math.random()*1000000;
-    var wordList = shuffleSeed.shuffle(words, seed).slice(0, 25);
+    wordList = shuffleSeed.shuffle(wordList, seed).slice(0, 25);
     var temp = wordList.map((word, index) => {
       if (index === 0) {
         return {id: index, word: word, type: "bomb", state: "hidden"}
