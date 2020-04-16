@@ -58,7 +58,9 @@ io.on("connection", (clientSocket) => {
     clientSocket.join(roomName);
     var usr = "";
     if(clientSocket.id in users){
-      usr=users[clientSocket.id]
+      usr = users[clientSocket.id]
+    }else{
+      usr = "Guest_"+(Math.floor(Math.random() * 99)+1);
     }
     myRooms[roomName].addClient(clientSocket.id, usr);
 
@@ -115,7 +117,17 @@ io.on("connection", (clientSocket) => {
   clientSocket.on("ChangeUsername", (usr) => {
     console.log("Client:", clientSocket.id, "set username:", usr);
     users[clientSocket.id]=usr;
-  })
+  });
+
+  clientSocket.on("MsgChange", (roomName, username, message) => {
+    console.log("Client:", clientSocket.id, "sent mesage in:", roomName);
+
+    myRooms[roomName].addMessage(username, message);
+
+    // Notify everyone in the room about change
+    console.log(myRooms[roomName].msgList)
+    io.sockets.in(roomName).emit("MsgUpdate", myRooms[roomName].msgList);
+  });
 });
 
 server.listen(port, () => console.log(`Listening on port ${port}`));

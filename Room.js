@@ -8,6 +8,8 @@ class Room{
     this.roomName = roomName;
     this.turn = "red";
     this.clients = {};
+    this.msgList = {};
+    this.msgId = 0;
   }
 
   wordListGenerator(language){
@@ -60,6 +62,11 @@ class Room{
   openCard(id){
     var idx = this.wordList.findIndex(item => item.id == id)
     this.wordList[idx].state = "open";
+  }
+
+  addMessage(username, message){
+    this.msgList[this.msgId] = {"id": this.msgId, "username": username, "message": message};
+    this.msgId += 1;
   }
 }
 
