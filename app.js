@@ -30,7 +30,7 @@ io.on("connection", (clientSocket) => {
           myRooms[roomName].removeClient(clientSocket.id);
           
           // Notify everyone in the room about all others
-          console.log(myRooms[roomName].clients)
+          //console.log(myRooms[roomName].clients)
           if(Object.keys(myRooms[roomName].clients).length>0){
             io.sockets.in(roomName).emit("ClientsUpdate", myRooms[roomName].clients);
           }else{
@@ -69,7 +69,7 @@ io.on("connection", (clientSocket) => {
       myRooms[roomName].addClient(clientSocket.id, usr);
 
       // Notify everyone in the room about all others
-      console.log(myRooms[roomName].clients)
+      //console.log(myRooms[roomName].clients)
       io.sockets.in(roomName).emit("ClientsUpdate", myRooms[roomName].clients);
       io.sockets.in(roomName).emit("BoardUpdate", myRooms[roomName].wordList);//
     } catch (error) {
@@ -85,7 +85,7 @@ io.on("connection", (clientSocket) => {
       myRooms[roomName].removeClient(clientSocket.id);
 
       // Notify everyone in the room about all others
-      console.log(myRooms[roomName].clients)
+      //console.log(myRooms[roomName].clients)
       if(Object.keys(myRooms[roomName].clients).length>0){
         io.sockets.in(roomName).emit("ClientsUpdate", myRooms[roomName].clients);
       }else{
@@ -102,7 +102,7 @@ io.on("connection", (clientSocket) => {
       myRooms[roomName].clients = clients;
 
       // Notify everyone in the room about all others
-      console.log(myRooms[roomName].clients)
+      //console.log(myRooms[roomName].clients)
       io.sockets.in(roomName).emit("ClientsUpdate", myRooms[roomName].clients);
     } catch (error) {
       console.log("Error 4")
@@ -144,7 +144,7 @@ io.on("connection", (clientSocket) => {
       myRooms[roomName].addMessage(username, message);
 
       // Notify everyone in the room about change
-      console.log(myRooms[roomName].msgList)
+      //console.log(myRooms[roomName].msgList)
       io.sockets.in(roomName).emit("MsgUpdate", myRooms[roomName].msgList);
     } catch (error) {
       console.log("Error 7")
